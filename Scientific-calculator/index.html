@@ -1,0 +1,220 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Scientific Calculator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #1e1e2f;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: #fff;
+    }
+
+    .calculator {
+      background-color: #2e2e3e;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+      width: 100%;
+      max-width: 480px;
+    }
+
+    .display {
+      background-color: #000;
+      color: #0f0;
+      font-size: 2.5rem;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: right;
+      margin-bottom: 20px;
+      overflow-x: auto;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+    }
+
+    .btn {
+      padding: 18px;
+      font-size: 1.2rem;
+      border: none;
+      border-radius: 8px;
+      background-color: #444;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.2s ease-in-out;
+    }
+
+    .btn:hover {
+      background-color: #555;
+    }
+
+    .btn.operator {
+      background-color: #4b79a1;
+    }
+
+    .btn.operator:hover {
+      background-color: #3a5e80;
+    }
+
+    .btn.function {
+      background-color: #3b8b3b;
+    }
+
+    .btn.function:hover {
+      background-color: #2a6a2a;
+    }
+
+    .btn.equal {
+      background-color: #ff6347;
+      color: #fff;
+    }
+
+    .btn.equal:hover {
+      background-color: #e55347;
+    }
+
+    .btn.clear {
+      background-color: #f2b632;
+      color: #000;
+    }
+
+    .btn.clear:hover {
+      background-color: #e1a72e;
+    }
+
+    .btn.double {
+      grid-column: span 2;
+    }
+
+    @media (max-width: 500px) {
+      .buttons {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="calculator">
+    <div id="result" class="display">0</div>
+
+    <div class="buttons">
+      <!-- Row 1 -->
+      <button class="btn" onclick="appendNumber('7')">7</button>
+      <button class="btn" onclick="appendNumber('8')">8</button>
+      <button class="btn" onclick="appendNumber('9')">9</button>
+      <button class="btn operator" onclick="appendOperator('/')">÷</button>
+      <button class="btn function" onclick="appendFunction('sin')">sin</button>
+
+      <!-- Row 2 -->
+      <button class="btn" onclick="appendNumber('4')">4</button>
+      <button class="btn" onclick="appendNumber('5')">5</button>
+      <button class="btn" onclick="appendNumber('6')">6</button>
+      <button class="btn operator" onclick="appendOperator('*')">×</button>
+      <button class="btn function" onclick="appendFunction('cos')">cos</button>
+
+      <!-- Row 3 -->
+      <button class="btn" onclick="appendNumber('1')">1</button>
+      <button class="btn" onclick="appendNumber('2')">2</button>
+      <button class="btn" onclick="appendNumber('3')">3</button>
+      <button class="btn operator" onclick="appendOperator('-')">−</button>
+      <button class="btn function" onclick="appendFunction('tan')">tan</button>
+
+      <!-- Row 4 -->
+      <button class="btn" onclick="appendNumber('0')">0</button>
+      <button class="btn" onclick="appendNumber('.')">.</button>
+      <button class="btn function" onclick="sqrt()">√</button>
+      <button class="btn operator" onclick="appendOperator('+')">+</button>
+      <button class="btn function" onclick="appendFunction('log')">log</button>
+
+      <!-- Row 5 -->
+      <button class="btn clear" onclick="clearInput()">C</button>
+      <button class="btn operator" onclick="appendOperator('^')">^</button>
+      <button class="btn equal double" onclick="calculate()">=</button>
+    </div>
+  </div>
+
+  <script>
+    let currentInput = '';
+
+    function appendNumber(num) {
+      currentInput += num;
+      updateDisplay();
+    }
+
+    function appendOperator(op) {
+      const lastChar = currentInput.slice(-1);
+      if (["+", "-", "/", "*", "^"].includes(lastChar)) {
+        currentInput = currentInput.slice(0, -1) + op;
+      } else {
+        currentInput += op;
+      }
+      updateDisplay();
+    }
+
+    function appendFunction(func) {
+      currentInput += func + "(";
+      updateDisplay();
+    }
+
+    function sqrt() {
+      currentInput += "sqrt(";
+      updateDisplay();
+    }
+
+    function clearInput() {
+      currentInput = '';
+      updateDisplay();
+    }
+
+    function calculate() {
+      let expression = currentInput;
+
+      const functionMap = {
+        'sin': 'Math.sin',
+        'cos': 'Math.cos',
+        'tan': 'Math.tan',
+        'log': 'Math.log10',
+        'sqrt': 'Math.sqrt'
+      };
+
+      for (const [key, value] of Object.entries(functionMap)) {
+        const regex = new RegExp(`${key}\\(`, 'g');
+        expression = expression.replace(regex, `${value}(`);
+      }
+
+      expression = expression.replace(/\^/g, '**');
+
+      try {
+        const result = eval(expression);
+        currentInput = result.toString();
+      } catch {
+        currentInput = "Error";
+      }
+
+      updateDisplay();
+    }
+
+    function updateDisplay() {
+      document.getElementById("result").textContent = currentInput || "0";
+    }
+  </script>
+</body>
+</html>
